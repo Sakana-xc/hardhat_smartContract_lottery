@@ -22,18 +22,18 @@ module.exports = async function ({ getNamedAccounts, deployments }) {
         vrfCoordinatorV2Address = networkConfig[chainId]["vrfCoordinatorV2"]
         subscriptionId = networkConfig[chainId]["subscritionId "]
     }
-    const entranceFee = networkConfig[chainId]["entranceFee"]
+    const entranceFee = networkConfig[chainId]["entranceFee"] || ethers.utils.parseEther("0.01")
     const gasLane = networkConfig[chainId]["gasLane"]
-    const callBackGasLimit = networkConfig[chainId]["callBackGasLimit "]
+    const callbackGasLimit = networkConfig[chainId]["callbackGasLimit"]
     const interval = networkConfig[chainId]["interval"]
 
     const args = [
         vrfCoordinatorV2Address,
         entranceFee,
+        interval,
         gasLane,
         subscriptionId,
-        callBackGasLimit,
-        interval,
+        callbackGasLimit,
     ]
     const raffle = await deploy("Raffle", {
         from: deployer,
