@@ -18,7 +18,7 @@ import "@chainlink/contracts/src/v0.8/interfaces/AutomationCompatibleInterface.s
 error Raffle__notEnoughFunds();
 error Raffle__TransferFailed();
 error Raffle__notOpen(); 
-error Raffle__upKeepNotNeeded(uint256 currentBlance, uint256 numOfPlayer, uint256 raffleState);
+error Raffle__upKeepNotNeeded(uint256 currentBalance, uint256 numOfPlayer, uint256 raffleState);
 
 /**@title A sample Raffle Contract
  * @author Cong
@@ -28,7 +28,7 @@ error Raffle__upKeepNotNeeded(uint256 currentBlance, uint256 numOfPlayer, uint25
 
 contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface{
     // type 
-    enum Raffle_state {
+    enum RaffleState {
         open,
         calculating
     }
@@ -45,7 +45,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface{
 
     //lottery
     address  private s_recentWinner;
-    Raffle_state private s_raffleState;
+    RaffleState private s_raffleState;
     uint256 private s_lastTimeStamp;
     uint256 private immutable i_interval;
 
@@ -69,7 +69,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface{
         i_gasLane = gasLane; 
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
-        s_raffleState = Raffle_state.open;
+        s_raffleState = RaffleState.open;
         s_lastTimeStamp = block.timestamp;
         i_interval = interval;
 
@@ -79,7 +79,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface{
         if (msg.value < i_entranceFee)  {
             revert Raffle__notEnoughFunds();
         }
-        if (s_raffleState != Raffle_state.open) {
+        if (s_raffleState != RaffleState.open) {
             revert Raffle__notOpen();
         }
         s_players.push(payable(msg.sender));
@@ -95,7 +95,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface{
      */
 
     function checkUpkeep(bytes memory /*checkData */) public view override returns(bool upKeepNeeded, bytes memory /* performe data?*/) {
-        bool is_Open = (Raffle_state.open == s_raffleState);
+        bool is_Open = (RaffleState.open == s_raffleState);
         bool timePassed = ((block.timestamp - s_lastTimeStamp)> i_interval);
         bool has_Player = (s_players.length > 0);
         bool has_Balance = (address(this).balance > 0);
@@ -115,7 +115,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface{
             revert Raffle__upKeepNotNeeded(address(this).balance, s_players.length,
             uint256 (s_raffleState));
         }
-        s_raffleState = Raffle_state.calculating;
+        s_raffleState = RaffleState.calculating;
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,
@@ -137,7 +137,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface{
         uint256 indexOfWinner = randomWords[0] % s_players.length;
         address payable recentWinner = s_players[indexOfWinner];
         s_recentWinner = recentWinner;
-        s_raffleState = Raffle_state.open;
+        s_raffleState = RaffleState.open;
         s_players = new address payable[] (0);
         s_lastTimeStamp = block.timestamp; 
 
@@ -149,6 +149,9 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface{
         emit winnerPicked(recentWinner);
     }
     /* view pure functions*/
+    function getRaffleState() public view returns (RaffleState) {
+        return s_raffleState;
+    }
 
     function getWinner() public view returns(address) {
         return s_recentWinner; 
@@ -158,9 +161,6 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface{
         return i_entranceFee;
     }
 
-    function getRecentWinner() public view returns(address) {
-        return s_recentWinner;
-    }
 
     function getNumWord() public pure returns (uint) {
         return NUM_WORDS;
@@ -172,6 +172,11 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface{
 
     function getLastestTimeStamp() public view returns(uint256) {
         return s_lastTimeStamp;
-    }        
+    }  
+
+    function getInterval() public view returns (uint256) {
+        return i_interval;
+    }
+      
    
 }
