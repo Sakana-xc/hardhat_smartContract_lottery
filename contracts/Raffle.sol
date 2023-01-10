@@ -75,7 +75,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface{
 
     }
     
-    function checkQualification() public payable{
+    function enterRaffle() public payable{
         if (msg.value < i_entranceFee)  {
             revert Raffle__notEnoughFunds();
         }
@@ -157,7 +157,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface{
         return s_recentWinner; 
     }
 
-    function getEntranceFee(uint256) public view returns(uint256) {
+    function getEntranceFee() public view returns(uint256) {
         return i_entranceFee;
     }
 
@@ -165,6 +165,11 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface{
     function getNumWord() public pure returns (uint) {
         return NUM_WORDS;
     }
+
+    function getPlayer(uint256 index) public view returns (address) {
+        return s_players[index];
+    }
+
 
     function getNumberOfPlayers() public view returns(uint256) {
         return s_players.length;
