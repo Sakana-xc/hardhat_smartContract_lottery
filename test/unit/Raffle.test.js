@@ -77,7 +77,7 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat.confi
                   //this round not finish
                   await network.provider.send("evm_increaseTime", [interval.toNumber() - 5])
                   await network.provider.send("evm_mine", [])
-                  const { upkeepNeeded } = await raffle.callStatic.checkUpkeep("0x")
+                  const [upkeepNeeded] = await raffle.callStatic.checkUpkeep("0x")
                   assert(!upkeepNeeded)
               })
 
@@ -85,7 +85,7 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat.confi
                   await raffle.enterRaffle({ value: raffleEntranceFee })
                   await network.provider.send("evm_increaseTime", [interval.toNumber() + 1])
                   await network.provider.send("evm_mine", [])
-                  const { upkeepNeeded } = await raffle.callStatic.checkUpkeep([])
+                  const [upkeepNeeded] = await raffle.callStatic.checkUpkeep("0x")
                   //   console.log(await raffle.callStatic.checkUpkeep([]))
                   assert(upkeepNeeded)
               })
@@ -138,8 +138,8 @@ const { developmentChains, networkConfig } = require("../../helper-hardhat.confi
                   const startingAccountIndex = 1 //deployer 0
                   const accounts = await ethers.getSigners()
                   for (let i = startingAccountIndex; i < additionalEntrance + 1; i++) {
-                      const accountConnected = raffle.connect(accounts[i])
-                      await accountConnected.enterRaffle({ value: raffleEntranceFee })
+                      const raffleWithOther = raffle.connect(accounts[i])
+                      await raffleWithOther.enterRaffle({ value: raffleEntranceFee })
                   }
                   const startingTimeStamp = await raffle.getLatestTimeStamp()
 
