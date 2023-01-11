@@ -20,7 +20,7 @@ module.exports = async function ({ getNamedAccounts, deployments }) {
         await vrfCoordinatorV2Mock.fundSubscription(subscriptionId, VRF_SUB_FUND_AMOUNT)
     } else {
         vrfCoordinatorV2Address = networkConfig[chainId]["vrfCoordinatorV2"]
-        subscriptionId = networkConfig[chainId]["subscritionId "]
+        subscriptionId = networkConfig[chainId]["subscritionId"]
     }
     const entranceFee = networkConfig[chainId]["entranceFee"] || ethers.utils.parseEther("0.01")
     const gasLane = networkConfig[chainId]["gasLane"]
@@ -39,7 +39,7 @@ module.exports = async function ({ getNamedAccounts, deployments }) {
         from: deployer,
         args: args,
         log: true,
-        waitConfirmations: network.config.blockConfirmations || 1,
+        waitconfirmations: developmentChains.includes(network.name) ? 1 : 6,
     })
 
     vrfCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock")
