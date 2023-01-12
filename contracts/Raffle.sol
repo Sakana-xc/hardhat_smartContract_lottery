@@ -129,7 +129,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface{
          * i_gasLane
          * uint32 callbackGasLimit
          * requestConfirmations,
-         *  numWords
+         * numWords
          */
         
     }

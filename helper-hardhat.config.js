@@ -19,6 +19,7 @@ const networkConfig = {
     },
 }
 
+//define dev
 const developmentChains = ["hardhat", "localhost"]
 
 module.exports = {
